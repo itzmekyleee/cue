@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">cue</string>
+    <string name="title_activity_review_view_model">ReviewViewModel</string>
 </resources>
