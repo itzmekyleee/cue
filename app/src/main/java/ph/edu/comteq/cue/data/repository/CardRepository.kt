@@ -17,6 +17,7 @@ class CardRepository(private val dao: CardDao) {
 
     suspend fun delete(card: Card) = dao.delete(card)
 
+    suspend fun restore(card: Card): Long = dao.insertOrReplace(card)
     suspend fun getDueCards(now: Long = System.currentTimeMillis()): List<Card> =
         dao.getDueCards(now)
 

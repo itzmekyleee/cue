@@ -7,11 +7,15 @@ import androidx.room3.Query
 import androidx.room3.Update
 import kotlinx.coroutines.flow.Flow
 import ph.edu.comteq.cue.data.local.entity.Card
+import androidx.room3.OnConflictStrategy
 
 @Dao
 interface CardDao {
     @Insert
     suspend fun insert(card: Card): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(card: Card): Long
 
     @Update
     suspend fun update(card: Card)

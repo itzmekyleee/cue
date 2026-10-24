@@ -43,6 +43,7 @@ fun AddSubjectDialog(
 ) {
     var name by remember { mutableStateOf("") }
     var selectedColor by remember { mutableStateOf(subjectColorKeys.first()) }
+    var nameTouched by remember { mutableStateOf(false) }
     val isNameBlank = name.isBlank()
 
     AlertDialog(
@@ -52,10 +53,18 @@ fun AddSubjectDialog(
             Column {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = {
+                        name = it
+                        nameTouched = true
+                    },
                     placeholder = { Text("Subject name") },
                     singleLine = true,
-                    isError = isNameBlank && name.isNotEmpty(),
+                    isError = nameTouched && isNameBlank,
+                    supportingText = if (nameTouched && isNameBlank) {
+                        { Text("Subject name can't be blank") }
+                    } else {
+                        null
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 

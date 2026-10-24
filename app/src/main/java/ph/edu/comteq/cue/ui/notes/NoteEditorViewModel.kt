@@ -115,4 +115,10 @@ class NoteEditorViewModel(
             cardRepository.delete(card)
         }
     }
+
+    fun restoreCard(card: Card) {
+        viewModelScope.launch {
+            cardRepository.restore(card)
+        }
+    }
 }

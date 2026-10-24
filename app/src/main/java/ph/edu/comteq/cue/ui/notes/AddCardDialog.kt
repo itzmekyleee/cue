@@ -27,6 +27,8 @@ fun AddCardDialog(
 ) {
     var question by remember { mutableStateOf(existingCard?.question ?: "") }
     var answer by remember { mutableStateOf(existingCard?.answer ?: "") }
+    var questionTouched by remember { mutableStateOf(false) }
+    var answerTouched by remember { mutableStateOf(false) }
     val isInvalid = question.isBlank() || answer.isBlank()
     val title = if (existingCard == null) "Add card" else "Edit card"
 
@@ -37,15 +39,33 @@ fun AddCardDialog(
             Column {
                 OutlinedTextField(
                     value = question,
-                    onValueChange = { question = it },
+                    onValueChange = {
+                        question = it
+                        questionTouched = true
+                    },
                     placeholder = { Text("Question") },
+                    isError = questionTouched && question.isBlank(),
+                    supportingText = if (questionTouched && question.isBlank()) {
+                        { Text("Question can't be blank") }
+                    } else {
+                        null
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = answer,
-                    onValueChange = { answer = it },
+                    onValueChange = {
+                        answer = it
+                        answerTouched = true
+                    },
                     placeholder = { Text("Answer") },
+                    isError = answerTouched && answer.isBlank(),
+                    supportingText = if (answerTouched && answer.isBlank()) {
+                        { Text("Answer can't be blank") }
+                    } else {
+                        null
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

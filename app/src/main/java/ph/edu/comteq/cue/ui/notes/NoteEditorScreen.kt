@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
 import androidx.compose.foundation.layout.Spacer
+import kotlinx.coroutines.launch
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
@@ -41,6 +42,7 @@ fun NoteEditorScreen(
         onAddCard = { question, answer -> viewModel.addCard(question, answer) },
         onUpdateCard = { viewModel.updateCard(it) },
         onDeleteCard = { viewModel.deleteCard(it) },
+        onRestoreCard = { viewModel.restoreCard(it) },
         onBackClick = onBackClick
     )
 }
@@ -61,6 +63,7 @@ fun NoteEditorScreenContent(
     onAddCard: (question: String, answer: String) -> Unit = { _, _ -> },
     onUpdateCard: (Card) -> Unit = {},
     onDeleteCard: (Card) -> Unit = {},
+    onRestoreCard: (Card) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
     var showUnsavedDialog by remember { mutableStateOf(false) }
@@ -75,7 +78,25 @@ fun NoteEditorScreenContent(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    fun deleteCardWithUndo(card: Card) {
+        onDeleteCard(card)
+        scope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = "Card deleted",
+                actionLabel = "Undo",
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                onRestoreCard(card)
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { },
@@ -138,7 +159,7 @@ fun NoteEditorScreenContent(
                     CardRow(
                         card = card,
                         onEditClick = { editingCard = card },
-                        onDeleteClick = { onDeleteCard(card) }
+                        onDeleteClick = { deleteCardWithUndo(card) },
                     )
                 }
             }
