@@ -9,17 +9,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ph.edu.comteq.cue.ui.components.LoadingState
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
 fun ProgressScreen(viewModel: ProgressViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    ProgressScreenContent(uiState = uiState)
+    val isLoading by viewModel.isLoading.collectAsState()
+    ProgressScreenContent(uiState = uiState, isLoading = isLoading)
 }
 
 /** Pure UI, no ViewModel. This is the one @Preview can show. */
 @Composable
-fun ProgressScreenContent(uiState: ProgressUiState) {
+fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -27,6 +29,9 @@ fun ProgressScreenContent(uiState: ProgressUiState) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            if (isLoading) {
+                LoadingState()
+            } else {
             Text(text = "Progress", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -56,6 +61,7 @@ fun ProgressScreenContent(uiState: ProgressUiState) {
             BoxCountRow(label = "Box 1", count = uiState.boxCounts[1] ?: 0)
             BoxCountRow(label = "Box 2", count = uiState.boxCounts[2] ?: 0)
             BoxCountRow(label = "Box 3", count = uiState.boxCounts[3] ?: 0)
+            }
         }
     }
 }

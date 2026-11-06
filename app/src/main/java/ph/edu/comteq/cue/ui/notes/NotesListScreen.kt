@@ -13,9 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Note
+import ph.edu.comteq.cue.ui.components.LoadingState
 import ph.edu.comteq.cue.ui.subjects.ReviewButton
 
 @Composable
@@ -29,11 +31,13 @@ fun NotesListScreen(
     val notes by viewModel.notes.collectAsState()
     val tags by viewModel.tags.collectAsState()
     val dueCount by viewModel.dueCount.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     NotesListScreenContent(
         notes = notes,
         tags = tags,
         dueCount = dueCount,
+        isLoading = isLoading,
         onBackClick = onBackClick,
         onReviewClick = onReviewClick,
         onNoteClick = onNoteClick,
@@ -50,6 +54,7 @@ fun NotesListScreenContent(
     notes: List<Note>,
     tags: List<String>,
     dueCount: Int = 0,
+    isLoading: Boolean = false,
     onBackClick: () -> Unit,
     onNoteClick: (Note) -> Unit,
     onReviewClick: () -> Unit = {},
@@ -125,7 +130,9 @@ fun NotesListScreenContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (notes.isEmpty() && searchText.isBlank() && selectedTag.isEmpty()) {
+            if (isLoading) {
+                LoadingState()
+            } else if (notes.isEmpty() && searchText.isBlank() && selectedTag.isEmpty()) {
                 EmptyNotesState()
             } else if (notes.isEmpty()) {
                 EmptyNotesState(message = "No notes match your search")
@@ -155,8 +162,20 @@ private fun TagChip(label: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun NoteRow(note: Note, onClick: () -> Unit) {
     ListItem(
-        headlineContent = { Text(note.title) },
-        supportingContent = { Text(note.body, maxLines = 1) },
+        headlineContent = {
+            Text(
+                text = note.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        supportingContent = {
+            Text(
+                text = note.body,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
         modifier = Modifier.clickable(onClick = onClick)
     )
     HorizontalDivider()

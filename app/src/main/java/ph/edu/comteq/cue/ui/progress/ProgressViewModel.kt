@@ -2,11 +2,14 @@ package ph.edu.comteq.cue.ui.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import ph.edu.comteq.cue.data.repository.CardRepository
 import ph.edu.comteq.cue.data.repository.ReviewRepository
 import java.util.Calendar
@@ -53,7 +56,7 @@ class ProgressViewModel(
         mapOf(1 to box1, 2 to box2, 3 to box3)
     }
 
-    val uiState: StateFlow<ProgressUiState> = combine(
+    private val uiStateFlow = combine(
         reviewedToday, accuracyPercent, streakDays, boxCounts
     ) { today, accuracy, streak, boxes ->
         ProgressUiState(
@@ -62,11 +65,23 @@ class ProgressViewModel(
             streakDays = streak,
             boxCounts = boxes
         )
-    }.stateIn(
+    }
+
+    val uiState: StateFlow<ProgressUiState> = uiStateFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = ProgressUiState()
     )
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    init {
+        viewModelScope.launch {
+            uiStateFlow.first()
+            _isLoading.value = false
+        }
+    }
 }
 
 /**

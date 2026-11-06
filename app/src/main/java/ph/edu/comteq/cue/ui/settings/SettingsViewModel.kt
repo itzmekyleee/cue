@@ -2,8 +2,11 @@ package ph.edu.comteq.cue.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ph.edu.comteq.cue.data.datastore.SettingsDataStore
@@ -13,6 +16,20 @@ class SettingsViewModel(
     private val dataStore: SettingsDataStore,
     private val subjectRepository: SubjectRepository
 ) : ViewModel() {
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    init {
+        viewModelScope.launch {
+            combine(
+                dataStore.theme,
+                dataStore.dailyGoal,
+                dataStore.sortByTitle
+            ) { _, _, _ -> Unit }.first()
+            _isLoading.value = false
+        }
+    }
 
     val theme: StateFlow<String> = dataStore.theme
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "system")

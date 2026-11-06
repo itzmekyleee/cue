@@ -20,6 +20,7 @@ import ph.edu.comteq.cue.data.local.AppDatabase
 import ph.edu.comteq.cue.data.local.entity.Subject
 import ph.edu.comteq.cue.data.repository.CardRepository
 import ph.edu.comteq.cue.data.repository.SubjectRepository
+import ph.edu.comteq.cue.ui.components.LoadingState
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import kotlinx.coroutines.launch
@@ -42,9 +43,11 @@ fun SubjectsScreen(
     }
     val subjects by viewModel.subjects.collectAsState()
     val totalDueCount by viewModel.totalDueCount.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     SubjectsScreenContent(
         subjects = subjects,
         dueCount = totalDueCount,
+        isLoading = isLoading,
         onReviewClick = onReviewClick,
         onSettingsClick = onSettingsClick,
         onSubjectClick = onSubjectClick,
@@ -61,6 +64,7 @@ fun SubjectsScreen(
 fun SubjectsScreenContent(
     subjects: List<Subject>,
     dueCount: Int = 0,
+    isLoading: Boolean = false,
     onReviewClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onSubjectClick: (Subject) -> Unit,
@@ -137,7 +141,9 @@ fun SubjectsScreenContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (subjects.isEmpty()) {
+            if (isLoading) {
+                LoadingState()
+            } else if (subjects.isEmpty()) {
                 EmptyState()
             } else if (filteredSubjects.isEmpty()) {
                 EmptyState(message = "No subjects match \"$searchText\"")

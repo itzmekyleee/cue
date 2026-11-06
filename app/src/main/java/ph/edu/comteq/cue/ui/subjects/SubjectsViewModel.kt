@@ -12,12 +12,23 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlin.time.Duration.Companion.seconds
 
 class SubjectsViewModel(
     private val repository: SubjectRepository,
     cardRepository: CardRepository
 ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    init {
+        viewModelScope.launch {
+            repository.subjects.first()
+            _isLoading.value = false
+        }
+    }
+
     val totalDueCount: StateFlow<Int> = cardRepository.totalDueCount()
         .stateIn(
             scope = viewModelScope,

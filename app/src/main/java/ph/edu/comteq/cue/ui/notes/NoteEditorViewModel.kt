@@ -34,6 +34,9 @@ class NoteEditorViewModel(
     private val _hasUnsavedChanges = MutableStateFlow(false)
     val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
 
+    private val _isLoading = MutableStateFlow(initialNoteId != null)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     val cards: StateFlow<List<Card>> = noteId
         .flatMapLatest { noteId ->
             noteId?.let { cardRepository.getCardsForNote(it) } ?: flowOf(emptyList())
@@ -53,6 +56,7 @@ class NoteEditorViewModel(
                     _body.value = note.body
                     _tagsText.value = note.tags
                 }
+                _isLoading.value = false
             }
         }
     }

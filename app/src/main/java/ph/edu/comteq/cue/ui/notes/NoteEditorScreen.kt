@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
+import ph.edu.comteq.cue.ui.components.LoadingState
 import androidx.compose.foundation.layout.Spacer
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,7 @@ fun NoteEditorScreen(
     val tagsText by viewModel.tagsText.collectAsState()
     val cards by viewModel.cards.collectAsState()
     val hasUnsavedChanges by viewModel.hasUnsavedChanges.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     NoteEditorScreenContent(
         title = title,
@@ -35,6 +37,7 @@ fun NoteEditorScreen(
         tagsText = tagsText,
         cards = cards,
         hasUnsavedChanges = hasUnsavedChanges,
+        isLoading = isLoading,
         onTitleChange = { viewModel.onTitleChange(it) },
         onBodyChange = { viewModel.onBodyChange(it) },
         onTagsTextChange = { viewModel.onTagsTextChange(it) },
@@ -56,6 +59,7 @@ fun NoteEditorScreenContent(
     tagsText: String,
     cards: List<Card>,
     hasUnsavedChanges: Boolean,
+    isLoading: Boolean = false,
     onTitleChange: (String) -> Unit = {},
     onBodyChange: (String) -> Unit = {},
     onTagsTextChange: (String) -> Unit = {},
@@ -113,6 +117,9 @@ fun NoteEditorScreenContent(
             )
         }
     ) { padding ->
+        if (isLoading) {
+            LoadingState(modifier = Modifier.padding(padding))
+        } else {
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -135,7 +142,10 @@ fun NoteEditorScreenContent(
                 onValueChange = onBodyChange,
                 placeholder = { Text("Write your note...") },
                 minLines = 4,
-                modifier = Modifier.fillMaxWidth()
+                maxLines = 12,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 120.dp, max = 240.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -172,6 +182,7 @@ fun NoteEditorScreenContent(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Add card")
             }
+        }
         }
     }
 

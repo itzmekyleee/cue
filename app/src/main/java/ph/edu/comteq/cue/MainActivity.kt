@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -113,7 +118,17 @@ fun Cue() {
             NavHost(
                 navController = navController,
                 startDestination = "subjects",
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
+                enterTransition = {
+                    fadeIn(animationSpec = tween(220)) +
+                        slideInHorizontally(animationSpec = tween(220)) { it / 12 }
+                },
+                exitTransition = { fadeOut(animationSpec = tween(160)) },
+                popEnterTransition = { fadeIn(animationSpec = tween(220)) },
+                popExitTransition = {
+                    fadeOut(animationSpec = tween(160)) +
+                        slideOutHorizontally(animationSpec = tween(220)) { -it / 12 }
+                }
             ) {
                 composable("subjects") {
                     SubjectsScreen(

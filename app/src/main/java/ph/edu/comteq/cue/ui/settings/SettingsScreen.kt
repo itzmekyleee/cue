@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ph.edu.comteq.cue.ui.components.LoadingState
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
@@ -14,11 +15,13 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
     val theme by viewModel.theme.collectAsState()
     val dailyGoal by viewModel.dailyGoal.collectAsState()
     val sortByTitle by viewModel.sortByTitle.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     SettingsScreenContent(
         theme = theme,
         dailyGoal = dailyGoal,
         sortByTitle = sortByTitle,
+        isLoading = isLoading,
         onThemeChange = { viewModel.setTheme(it) },
         onDailyGoalChange = { viewModel.setDailyGoal(it) },
         onSortByTitleChange = { viewModel.setSortByTitle(it) },
@@ -32,6 +35,7 @@ fun SettingsScreenContent(
     theme: String,
     dailyGoal: Int,
     sortByTitle: Boolean,
+    isLoading: Boolean = false,
     onThemeChange: (String) -> Unit = {},
     onDailyGoalChange: (Int) -> Unit = {},
     onSortByTitleChange: (Boolean) -> Unit = {},
@@ -42,6 +46,9 @@ fun SettingsScreenContent(
     var showClearConfirm by remember { mutableStateOf(false) }
 
     Scaffold { padding ->
+        if (isLoading) {
+            LoadingState(modifier = Modifier.padding(padding))
+        } else {
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             Text(
                 text = "Settings",
@@ -76,6 +83,7 @@ fun SettingsScreenContent(
                 isDanger = true,
                 onClick = { showClearConfirm = true }
             )
+        }
         }
     }
 
@@ -161,8 +169,9 @@ private fun SettingsSwitchRow(
     ListItem(
         headlineContent = { Text("Sort by title") },
         trailingContent = {
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
+            Switch(checked = checked, onCheckedChange = null)
+        },
+        modifier = Modifier.clickable { onCheckedChange(!checked) }
     )
 }
 

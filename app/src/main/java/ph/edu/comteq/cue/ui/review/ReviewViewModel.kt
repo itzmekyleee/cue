@@ -20,6 +20,9 @@ class ReviewViewModel(
     private val _queue = MutableStateFlow<List<Card>>(emptyList())
     val queue: StateFlow<List<Card>> = _queue
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex: StateFlow<Int> = _currentIndex
 
@@ -53,6 +56,7 @@ class ReviewViewModel(
                 cardRepository.getDueCards(now)
             }
             _queue.value = ReviewBoxes.orderForSession(due)
+            _isLoading.value = false
         }
     }
 

@@ -25,9 +25,16 @@ class NotesListViewModel(
     private val selectedTag = MutableStateFlow("")
     private val sortByTitle = MutableStateFlow(false)
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     init {
         viewModelScope.launch {
             sortByTitle.value = settingsDataStore.sortByTitle.first()
+        }
+        viewModelScope.launch {
+            repository.getNotes(subjectId).first()
+            _isLoading.value = false
         }
     }
 

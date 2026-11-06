@@ -1,6 +1,7 @@
 package ph.edu.comteq.cue.ui.subjects
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Spacer
@@ -99,21 +106,27 @@ fun AddSubjectDialog(
 
 @Composable
 private fun ColorDot(colorKey: String, selected: Boolean, onClick: () -> Unit) {
-    androidx.compose.foundation.Canvas(
+    val label = colorKey.replaceFirstChar { it.uppercase() }
+    Box(
         modifier = Modifier
-            .size(32.dp)
+            .size(48.dp)
             .clip(CircleShape)
-            .clickableDot(onClick)
+            .clickable(onClick = onClick)
+            .semantics {
+                contentDescription = "$label subject color"
+                this.selected = selected
+                role = Role.RadioButton
+            },
+        contentAlignment = Alignment.Center
     ) {
-        drawCircle(color = colorForKey(colorKey))
-        if (selected) {
-            drawCircle(color = Color.Black, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4f))
+        androidx.compose.foundation.Canvas(modifier = Modifier.size(32.dp)) {
+            drawCircle(color = colorForKey(colorKey))
+            if (selected) {
+                drawCircle(color = Color.Black, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4f))
+            }
         }
     }
 }
-
-private fun Modifier.clickableDot(onClick: () -> Unit): Modifier =
-    this.clickable(onClick = onClick)
 
 @Preview(showBackground = true)
 @Composable
