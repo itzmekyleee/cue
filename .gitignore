@@ -14,3 +14,9 @@
 .cxx
 local.properties
 /app/src/main/java/ph/edu/comteq/cue/cue-dev-checklist.md
+.idea/androidTestResultsUserPreferences.xml
+.idea/compiler.xml
+.idea/deploymentTargetSelector.xml
+.idea/inspectionProfiles/
+.idea/markdown.xml
+.idea/migrations.xml

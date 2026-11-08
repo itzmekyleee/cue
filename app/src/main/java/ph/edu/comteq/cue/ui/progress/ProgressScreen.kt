@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.LargePageHeader
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
@@ -22,25 +23,30 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
 /** Pure UI, no ViewModel. This is the one @Preview can show. */
 @Composable
 fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) {
-    Scaffold { padding ->
+    Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0)) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             if (isLoading) {
                 LoadingState()
             } else {
-            Text(text = "Progress", style = MaterialTheme.typography.headlineMedium)
+            LargePageHeader(title = "Progress")
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            StreakCard(streakDays = uiState.streakDays)
+            StreakCard(
+                streakDays = uiState.streakDays,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
                 StatCard(
                     label = "Reviewed today",
                     value = uiState.reviewedToday.toString(),
@@ -55,20 +61,24 @@ fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) 
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(text = "CARDS BY BOX", style = MaterialTheme.typography.labelMedium)
+            Text(
+                text = "CARDS BY BOX",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
-            BoxCountRow(label = "Box 1", count = uiState.boxCounts[1] ?: 0)
-            BoxCountRow(label = "Box 2", count = uiState.boxCounts[2] ?: 0)
-            BoxCountRow(label = "Box 3", count = uiState.boxCounts[3] ?: 0)
+            BoxCountRow(label = "Box 1", count = uiState.boxCounts[1] ?: 0, modifier = Modifier.padding(horizontal = 16.dp))
+            BoxCountRow(label = "Box 2", count = uiState.boxCounts[2] ?: 0, modifier = Modifier.padding(horizontal = 16.dp))
+            BoxCountRow(label = "Box 3", count = uiState.boxCounts[3] ?: 0, modifier = Modifier.padding(horizontal = 16.dp))
             }
         }
     }
 }
 
 @Composable
-private fun StreakCard(streakDays: Int) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun StreakCard(streakDays: Int, modifier: Modifier = Modifier) {
+    Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "$streakDays day${if (streakDays == 1) "" else "s"}", style = MaterialTheme.typography.headlineSmall)
             Text(text = "Current streak", style = MaterialTheme.typography.bodyMedium)
@@ -87,10 +97,10 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
 }
 
 @Composable
-private fun BoxCountRow(label: String, count: Int) {
+private fun BoxCountRow(label: String, count: Int, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
         Text(text = count.toString(), style = MaterialTheme.typography.bodyMedium)

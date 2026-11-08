@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.LargePageHeader
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
@@ -45,16 +46,12 @@ fun SettingsScreenContent(
     var showGoalDialog by remember { mutableStateOf(false) }
     var showClearConfirm by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
+    Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0)) { padding ->
         if (isLoading) {
             LoadingState(modifier = Modifier.padding(padding))
         } else {
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Text(
-                text = "Settings",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
-            )
+            LargePageHeader(title = "Settings")
 
             SettingsGroupLabel("APPEARANCE")
             SettingsRow(

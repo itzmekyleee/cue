@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Add
@@ -15,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.NavigationPageHeader
 import androidx.compose.foundation.layout.Spacer
 import kotlinx.coroutines.launch
 
@@ -100,15 +100,12 @@ fun NoteEditorScreenContent(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { handleBackClick() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
+            NavigationPageHeader(
+                title = title.ifBlank { "New note" },
+                onBackClick = { handleBackClick() },
                 actions = {
                     TextButton(onClick = onSave) {
                         Text("Save")

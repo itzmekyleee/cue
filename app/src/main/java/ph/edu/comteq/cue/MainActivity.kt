@@ -10,12 +10,23 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -48,11 +59,12 @@ import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 class MainActivity : ComponentActivity() {
@@ -86,31 +98,91 @@ fun Cue() {
         Scaffold(
             bottomBar = {
                 if (currentRoute in topLevelRoutes) {
-                    NavigationBar {
-                        NavigationBarItem(
-                            selected = currentRoute == "subjects",
-                            onClick = { navController.navigate("subjects") { launchSingleTop = true } },
-                            icon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "Subjects") },
-                            label = { Text("Subjects") }
-                        )
-                        NavigationBarItem(
-                            selected = currentRoute == "review?subjectId={subjectId}",
-                            onClick = { navController.navigate("review") { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.Style, contentDescription = "Review") },
-                            label = { Text("Review") }
-                        )
-                        NavigationBarItem(
-                            selected = currentRoute == "progress",
-                            onClick = { navController.navigate("progress") { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.BarChart, contentDescription = "Progress") },
-                            label = { Text("Progress") }
-                        )
-                        NavigationBarItem(
-                            selected = currentRoute == "settings",
-                            onClick = { navController.navigate("settings") { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                            label = { Text("Settings") }
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        NavigationBar(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp)
+                                .clip(RoundedCornerShape(24.dp)),
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            windowInsets = WindowInsets(0, 0, 0, 0),
+                            tonalElevation = 4.dp
+                        ) {
+                            NavigationBarItem(
+                                selected = currentRoute == "subjects",
+                                onClick = { navController.navigate("subjects") { launchSingleTop = true } },
+                                icon = {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.MenuBook,
+                                        contentDescription = "Subjects",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        "Subjects",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+                                    )
+                                }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "review?subjectId={subjectId}",
+                                onClick = { navController.navigate("review") { launchSingleTop = true } },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Style,
+                                        contentDescription = "Review",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        "Review",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+                                    )
+                                }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "progress",
+                                onClick = { navController.navigate("progress") { launchSingleTop = true } },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.BarChart,
+                                        contentDescription = "Progress",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        "Progress",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+                                    )
+                                }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "settings",
+                                onClick = { navController.navigate("settings") { launchSingleTop = true } },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Settings,
+                                        contentDescription = "Settings",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        "Settings",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -135,8 +207,7 @@ fun Cue() {
                         onSubjectClick = { subject ->
                             navController.navigate("subject/${subject.id}")
                         },
-                        onReviewClick = { navController.navigate("review") },
-                        onSettingsClick = { navController.navigate("settings") }
+                        onReviewClick = { navController.navigate("review") }
                     )
                 }
                 composable("settings") {

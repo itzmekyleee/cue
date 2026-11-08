@@ -6,8 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +19,8 @@ import ph.edu.comteq.cue.data.local.entity.Subject
 import ph.edu.comteq.cue.data.repository.CardRepository
 import ph.edu.comteq.cue.data.repository.SubjectRepository
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.LargePageHeader
+import ph.edu.comteq.cue.ui.components.SearchField
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import kotlinx.coroutines.launch
@@ -30,8 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SubjectsScreen(
     onSubjectClick: (Subject) -> Unit,
-    onReviewClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onReviewClick: () -> Unit
 ) {
     val context = LocalContext.current
     val viewModel: SubjectsViewModel = viewModel {
@@ -49,7 +48,6 @@ fun SubjectsScreen(
         dueCount = totalDueCount,
         isLoading = isLoading,
         onReviewClick = onReviewClick,
-        onSettingsClick = onSettingsClick,
         onSubjectClick = onSubjectClick,
         onAddSubject = { name, colorKey -> viewModel.addSubject(name, colorKey) },
         onRenameSubject = { subject, newName -> viewModel.renameSubject(subject, newName) },
@@ -66,7 +64,6 @@ fun SubjectsScreenContent(
     dueCount: Int = 0,
     isLoading: Boolean = false,
     onReviewClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {},
     onSubjectClick: (Subject) -> Unit,
     onAddSubject: (name: String, colorKey: String) -> Unit,
     onRenameSubject: (subject: Subject, newName: String) -> Unit = { _, _ -> },
@@ -103,6 +100,7 @@ fun SubjectsScreenContent(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
@@ -111,32 +109,15 @@ fun SubjectsScreenContent(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            ) {
-                Text(
-                    text = "Subjects",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.weight(1f)
-                )
+            LargePageHeader(title = "Subjects") {
                 ReviewButton(dueCount = dueCount, onClick = onReviewClick)
-                IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                }
             }
 
-            OutlinedTextField(
+            SearchField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = { Text("Search subjects") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                placeholder = "Search subjects",
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))

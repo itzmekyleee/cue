@@ -3,8 +3,6 @@ package ph.edu.comteq.cue.ui.review
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
 import ph.edu.comteq.cue.data.local.entity.Card as CardEntity
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.NavigationPageHeader
 
 /** Talks to the ViewModel. Used by the real app. */
 @Composable
@@ -65,16 +64,8 @@ fun ReviewScreenContent(
     onAnswer: (wasCorrect: Boolean) -> Unit = {}
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Review") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = { NavigationPageHeader(title = "Review", onBackClick = onBackClick) }
     ) { padding ->
         Column(
             modifier = Modifier

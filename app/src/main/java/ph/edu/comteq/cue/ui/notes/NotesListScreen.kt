@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Note
 import ph.edu.comteq.cue.ui.components.LoadingState
+import ph.edu.comteq.cue.ui.components.NavigationPageHeader
+import ph.edu.comteq.cue.ui.components.SearchField
 import ph.edu.comteq.cue.ui.subjects.ReviewButton
 
 @Composable
@@ -66,6 +66,7 @@ fun NotesListScreenContent(
     var selectedTag by remember { mutableStateOf("") }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(onClick = onAddNoteClick) {
                 Icon(Icons.Default.Add, contentDescription = "Add note")
@@ -73,31 +74,18 @@ fun NotesListScreenContent(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-            ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back to subjects")
-                }
-                Spacer(modifier = Modifier.weight(1f))
+            NavigationPageHeader(title = "Notes", onBackClick = onBackClick) {
                 ReviewButton(dueCount = dueCount, onClick = onReviewClick)
             }
 
-            OutlinedTextField(
+            SearchField(
                 value = searchText,
                 onValueChange = {
                     searchText = it
                     onSearchTextChange(it)
                 },
-                placeholder = { Text("Search notes") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                placeholder = "Search notes",
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
