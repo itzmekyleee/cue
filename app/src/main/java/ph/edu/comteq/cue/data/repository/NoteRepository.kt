@@ -15,7 +15,7 @@ class NoteRepository(private val dao: NoteDao) {
     ): Flow<List<Note>> = dao.getNotes(subjectId, query.trim(), tag, sortByTitle)
 
     fun getTags(subjectId: Long): Flow<List<String>> = dao.getTagStrings(subjectId).map { rows ->
-        rows.flatMap { it.split(".") }
+        rows.flatMap { it.split(",") }
             .map { it.trim() }
             .filter { it.isNotEmpty() }
             .distinct()

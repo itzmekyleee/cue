@@ -9,13 +9,23 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +66,6 @@ import ph.edu.comteq.cue.ui.subjects.SubjectsScreenContent
 import ph.edu.comteq.cue.ui.theme.CueTheme
 import ph.edu.comteq.cue.ui.progress.ProgressScreen
 import ph.edu.comteq.cue.ui.progress.ProgressViewModel
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Style
@@ -60,11 +73,9 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 class MainActivity : ComponentActivity() {
@@ -102,86 +113,53 @@ fun Cue() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .navigationBarsPadding()
-                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        NavigationBar(
+                        Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(64.dp)
-                                .clip(RoundedCornerShape(24.dp)),
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            windowInsets = WindowInsets(0, 0, 0, 0),
-                            tonalElevation = 4.dp
+                                .height(68.dp)
+                                .clip(RoundedCornerShape(22.dp)),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            shadowElevation = 5.dp,
+                            border = BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+                            ),
+                            shape = RoundedCornerShape(22.dp)
                         ) {
-                            NavigationBarItem(
-                                selected = currentRoute == "subjects",
-                                onClick = { navController.navigate("subjects") { launchSingleTop = true } },
-                                icon = {
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.MenuBook,
-                                        contentDescription = "Subjects",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        "Subjects",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
-                                    )
-                                }
-                            )
-                            NavigationBarItem(
-                                selected = currentRoute == "review?subjectId={subjectId}",
-                                onClick = { navController.navigate("review") { launchSingleTop = true } },
-                                icon = {
-                                    Icon(
-                                        Icons.Default.Style,
-                                        contentDescription = "Review",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        "Review",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
-                                    )
-                                }
-                            )
-                            NavigationBarItem(
-                                selected = currentRoute == "progress",
-                                onClick = { navController.navigate("progress") { launchSingleTop = true } },
-                                icon = {
-                                    Icon(
-                                        Icons.Default.BarChart,
-                                        contentDescription = "Progress",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        "Progress",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
-                                    )
-                                }
-                            )
-                            NavigationBarItem(
-                                selected = currentRoute == "settings",
-                                onClick = { navController.navigate("settings") { launchSingleTop = true } },
-                                icon = {
-                                    Icon(
-                                        Icons.Default.Settings,
-                                        contentDescription = "Settings",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        "Settings",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
-                                    )
-                                }
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                FloatingNavigationItem(
+                                    label = "Subjects",
+                                    icon = Icons.AutoMirrored.Filled.MenuBook,
+                                    selected = currentRoute == "subjects",
+                                    onClick = { navController.navigate("subjects") { launchSingleTop = true } }
+                                )
+                                FloatingNavigationItem(
+                                    label = "Review",
+                                    icon = Icons.Default.Style,
+                                    selected = currentRoute == "review?subjectId={subjectId}",
+                                    onClick = { navController.navigate("review") { launchSingleTop = true } }
+                                )
+                                FloatingNavigationItem(
+                                    label = "Progress",
+                                    icon = Icons.Default.BarChart,
+                                    selected = currentRoute == "progress",
+                                    onClick = { navController.navigate("progress") { launchSingleTop = true } }
+                                )
+                                FloatingNavigationItem(
+                                    label = "Settings",
+                                    icon = Icons.Default.Settings,
+                                    selected = currentRoute == "settings",
+                                    onClick = { navController.navigate("settings") { launchSingleTop = true } }
+                                )
+                            }
                         }
                     }
                 }
@@ -259,7 +237,7 @@ fun Cue() {
                         viewModel = viewModel,
                         onBackClick = { navController.popBackStack() },
                         onNoteClick = { note ->
-                            navController.navigate("subject/$subjectId/note/${note.id}")
+                            navController.navigate("subject/$subjectId/note?noteId=${note.id}")
                         },
                         onAddNoteClick = {
                             navController.navigate("subject/$subjectId/note")
@@ -310,6 +288,70 @@ fun Cue() {
     }
 }
 
+@Composable
+private fun RowScope.FloatingNavigationItem(
+    label: String,
+    icon: ImageVector,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val iconBackground by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surfaceContainerHigh,
+        animationSpec = tween(180),
+        label = "navigationIconBackground"
+    )
+    val iconTint by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.onSurfaceVariant,
+        animationSpec = tween(180),
+        label = "navigationIconTint"
+    )
+    val labelTint by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.onSurfaceVariant,
+        animationSpec = tween(180),
+        label = "navigationLabelTint"
+    )
+
+    Row(
+        modifier = Modifier
+            .weight(1f)
+            .height(52.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(iconBackground)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                role = Role.Tab
+            )
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = iconTint,
+            modifier = Modifier.size(19.dp)
+        )
+        Text(
+            text = label,
+            color = labelTint,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = 10.sp,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                letterSpacing = 0.sp
+            ),
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Clip,
+            modifier = Modifier.padding(start = 4.dp)
+        )
+    }
+}
 
 private const val NO_NOTE_ID = -1L
 private const val NO_SUBJECT_ID = -1L

@@ -76,10 +76,9 @@ class NoteEditorViewModel(
         _hasUnsavedChanges.value = true
     }
 
-    fun save() {
+    fun save(onSaved: () -> Unit = {}) {
         viewModelScope.launch {
             val saveId = noteRepository.save(
-
                 Note(
                     id = noteId.value ?: 0,
                     subjectId = subjectId,
@@ -90,6 +89,7 @@ class NoteEditorViewModel(
             )
             noteId.value = saveId
             _hasUnsavedChanges.value = false
+            onSaved()
         }
     }
 

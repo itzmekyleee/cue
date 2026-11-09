@@ -1,16 +1,25 @@
 package ph.edu.comteq.cue.ui.subjects
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,8 +30,6 @@ import ph.edu.comteq.cue.data.repository.SubjectRepository
 import ph.edu.comteq.cue.ui.components.LoadingState
 import ph.edu.comteq.cue.ui.components.LargePageHeader
 import ph.edu.comteq.cue.ui.components.SearchField
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import kotlinx.coroutines.launch
 
 
@@ -73,6 +80,7 @@ fun SubjectsScreenContent(
     var searchText by remember { mutableStateOf("") }
     var showAddDialog by remember { mutableStateOf(false) }
     var renamingSubject by remember { mutableStateOf<Subject?>(null) }
+    var pendingDeletion by remember { mutableStateOf<Subject?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     var coroutineScope = rememberCoroutineScope()
@@ -129,13 +137,23 @@ fun SubjectsScreenContent(
             } else if (filteredSubjects.isEmpty()) {
                 EmptyState(message = "No subjects match \"$searchText\"")
             } else {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        top = 12.dp,
+                        end = 16.dp,
+                        bottom = 96.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     items(filteredSubjects, key = { it.id }) { subject ->
                         SubjectRow(
                             subject = subject,
                             onClick = { onSubjectClick(subject) },
                             onRenameClick = { renamingSubject = subject },
-                            onDeleteClick = { deleteWithUndo(subject) }
+                            onDeleteClick = { pendingDeletion = subject },
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
@@ -162,6 +180,35 @@ fun SubjectsScreenContent(
             }
         )
     }
+    pendingDeletion?.let { subject ->
+        AlertDialog(
+            onDismissRequest = { pendingDeletion = null },
+            title = { Text("Delete subject?") },
+            text = {
+                Text(
+                    "\"${subject.name}\" and its notes and cards will be permanently deleted."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleteWithUndo(subject)
+                        pendingDeletion = null
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeletion = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -184,23 +231,87 @@ private fun SubjectRow(
     subject: Subject,
     onClick: () -> Unit,
     onRenameClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    ListItem(
-        headlineContent = { Text(subject.name) },
-        trailingContent = {
-            Row {
-                IconButton(onClick = onRenameClick) {
-                    Icon(Icons.Default.Edit, contentDescription = "Rename ${subject.name}")
-                }
-                IconButton(onClick = onDeleteClick) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete ${subject.name}")
-                }
+    val accent = colorForKey(subject.colorKey)
+
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(accent.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(21.dp)
+                )
             }
-        },
-        modifier = Modifier.clickable(onClick = onClick)
-    )
-    HorizontalDivider()
+            Text(
+                text = subject.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp),
+                overflow = TextOverflow.Ellipsis
+            )
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .clickable(onClick = onRenameClick, role = Role.Button),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = "Rename ${subject.name}",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .clickable(onClick = onDeleteClick, role = Role.Button),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete ${subject.name}",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable

@@ -41,7 +41,7 @@ fun NoteEditorScreen(
         onTitleChange = { viewModel.onTitleChange(it) },
         onBodyChange = { viewModel.onBodyChange(it) },
         onTagsTextChange = { viewModel.onTagsTextChange(it) },
-        onSave = { viewModel.save() },
+        onSave = { viewModel.save(onSaved = onBackClick) },
         onAddCard = { question, answer -> viewModel.addCard(question, answer) },
         onUpdateCard = { viewModel.updateCard(it) },
         onDeleteCard = { viewModel.deleteCard(it) },
