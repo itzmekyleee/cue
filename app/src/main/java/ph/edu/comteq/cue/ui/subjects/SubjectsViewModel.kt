@@ -61,10 +61,10 @@ class SubjectsViewModel(
         }
     }
 
-    fun renameSubject(subject: Subject, newName: String) {
+    fun renameSubject(subject: Subject, newName: String, colorKey: String) {
         if (newName.isBlank()) return
         viewModelScope.launch {
-            repository.rename(subject, newName)
+            repository.rename(subject, newName, colorKey)
         }
     }
 

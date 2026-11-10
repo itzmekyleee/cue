@@ -7,11 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,7 +57,9 @@ fun SubjectsScreen(
         onReviewClick = onReviewClick,
         onSubjectClick = onSubjectClick,
         onAddSubject = { name, colorKey -> viewModel.addSubject(name, colorKey) },
-        onRenameSubject = { subject, newName -> viewModel.renameSubject(subject, newName) },
+        onRenameSubject = { subject, newName, colorKey ->
+            viewModel.renameSubject(subject, newName, colorKey)
+        },
         onDeleteSubject = { subject -> viewModel.deleteSubject(subject) },
         onUndoDelete = { subject -> viewModel.undoSubjectDelete(subject) }
     )
@@ -73,7 +75,7 @@ fun SubjectsScreenContent(
     onReviewClick: () -> Unit = {},
     onSubjectClick: (Subject) -> Unit,
     onAddSubject: (name: String, colorKey: String) -> Unit,
-    onRenameSubject: (subject: Subject, newName: String) -> Unit = { _, _ -> },
+    onRenameSubject: (subject: Subject, newName: String, colorKey: String) -> Unit = { _, _, _ -> },
     onDeleteSubject: (subject: Subject) -> Unit = {},
     onUndoDelete: (subject: Subject) -> Unit = {}
 ) {
@@ -174,8 +176,8 @@ fun SubjectsScreenContent(
         RenameSubjectDialog(
             subject = subject,
             onDismiss = { renamingSubject = null },
-            onConfirm = { newName ->
-                onRenameSubject(subject, newName)
+            onConfirm = { newName, colorKey ->
+                onRenameSubject(subject, newName, colorKey)
                 renamingSubject = null
             }
         )
@@ -263,7 +265,7 @@ private fun SubjectRow(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                    imageVector = Icons.Default.Folder,
                     contentDescription = null,
                     tint = accent,
                     modifier = Modifier.size(21.dp)

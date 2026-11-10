@@ -9,7 +9,8 @@ class SubjectRepository(private val dao: SubjectDao) {
 
     suspend fun add(name: String, colorKey: String): Long = dao.insert(Subject(name = name.trim(), colorKey = colorKey))
 
-    suspend fun rename(subject: Subject, newName: String) = dao.update(subject.copy(name = newName.trim()))
+    suspend fun rename(subject: Subject, newName: String, colorKey: String) =
+        dao.update(subject.copy(name = newName.trim(), colorKey = colorKey))
 
     suspend fun delete(subject: Subject) = dao.delete(subject)
 

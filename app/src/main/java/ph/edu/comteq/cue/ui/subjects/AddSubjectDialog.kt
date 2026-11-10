@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -75,17 +80,11 @@ fun AddSubjectDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.padding(top = 12.dp))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    subjectColorKeys.forEach { key ->
-                        ColorDot(
-                            colorKey = key,
-                            selected = key == selectedColor,
-                            onClick = { selectedColor = key }
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+                SubjectColorPicker(
+                    selectedColor = selectedColor,
+                    onColorSelected = { selectedColor = it }
+                )
             }
         },
         confirmButton = {
@@ -105,11 +104,39 @@ fun AddSubjectDialog(
 }
 
 @Composable
+fun SubjectColorPicker(selectedColor: String, onColorSelected: (String) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Subject color",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            subjectColorKeys.forEach { key ->
+                ColorDot(
+                    colorKey = key,
+                    selected = key == selectedColor,
+                    onClick = { onColorSelected(key) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ColorDot(colorKey: String, selected: Boolean, onClick: () -> Unit) {
     val label = colorKey.replaceFirstChar { it.uppercase() }
     Box(
         modifier = Modifier
-            .size(48.dp)
+            .size(52.dp)
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .semantics {
@@ -119,10 +146,26 @@ private fun ColorDot(colorKey: String, selected: Boolean, onClick: () -> Unit) {
             },
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.size(32.dp)) {
-            drawCircle(color = colorForKey(colorKey))
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .border(
+                    width = if (selected) 2.dp else 0.dp,
+                    color = if (selected) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    shape = CircleShape
+                )
+                .padding(4.dp)
+                .size(28.dp)
+                .background(colorForKey(colorKey), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
             if (selected) {
-                drawCircle(color = Color.Black, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4f))
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }
