@@ -1,19 +1,28 @@
 package ph.edu.comteq.cue.ui.review
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
-import ph.edu.comteq.cue.data.local.entity.Card as CardEntity
 import ph.edu.comteq.cue.ui.components.LoadingState
 import ph.edu.comteq.cue.ui.components.NavigationPageHeader
 
@@ -79,18 +88,34 @@ fun ReviewScreenContent(
                 totalCards == 0 -> NothingDueState()
                 isSessionComplete -> SessionSummary(sessionCorrect, sessionTotal)
                 currentCard != null -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Due cards",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "${currentIndex + 1} / $totalCards",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
                     LinearProgressIndicator(
                         progress = { (currentIndex + 1f) / totalCards },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .semantics { contentDescription = "Review progress" }
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(50))
+                            .semantics { contentDescription = "Review progress" },
+                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Card ${currentIndex + 1} of $totalCards",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     FlipCard(
                         card = currentCard,
@@ -99,7 +124,7 @@ fun ReviewScreenContent(
                         modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
                     if (isFlipped) {
                         Row(
@@ -108,13 +133,20 @@ fun ReviewScreenContent(
                         ) {
                             OutlinedButton(
                                 onClick = { onAnswer(false) },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f).height(54.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error
+                                ),
+                                border = BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                                )
                             ) {
                                 Text("Missed")
                             }
                             Button(
                                 onClick = { onAnswer(true) },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f).height(54.dp)
                             ) {
                                 Text("Got it")
                             }
@@ -122,7 +154,7 @@ fun ReviewScreenContent(
                     } else {
                         Button(
                             onClick = onFlip,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().height(54.dp)
                         ) {
                             Text("Show answer")
                         }
@@ -150,29 +182,68 @@ private fun FlipCard(
         onClick = onFlip,
         modifier = modifier
             .fillMaxWidth()
+            .padding(bottom = 2.dp)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 12f * density
-            }
+            },
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        ),
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 22.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (rotation <= 90f) {
+            Text(
+                text = if (rotation <= 90f) "QUESTION" else "ANSWER",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = if (rotation > 90f) {
+                    Modifier.graphicsLayer { rotationY = 180f }
+                } else {
+                    Modifier
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = card.question,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-            } else {
-                Text(
-                    text = card.answer,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.graphicsLayer { rotationY = 180f }
+                    text = if (rotation <= 90f) card.question else card.answer,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = if (rotation > 90f) {
+                        Modifier
+                            .fillMaxWidth()
+                            .graphicsLayer { rotationY = 180f }
+                    } else {
+                        Modifier.fillMaxWidth()
+                    }
                 )
             }
+            Text(
+                text = if (isFlipped) "Tap to see question" else "Tap to reveal answer",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = if (rotation > 90f) {
+                    Modifier.graphicsLayer { rotationY = 180f }
+                } else {
+                    Modifier
+                }
+            )
         }
     }
 }
@@ -180,18 +251,66 @@ private fun FlipCard(
 @Composable
 private fun SessionSummary(correct: Int, total: Int) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("All done for today", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("$correct of $total correct", style = MaterialTheme.typography.bodyLarge)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(88.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "${if (total == 0) 0 else correct * 100 / total}%",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            Text(
+                text = "Review complete",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "$correct of $total cards remembered",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
 @Composable
 private fun NothingDueState() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Nothing due right now", style = MaterialTheme.typography.bodyLarge)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "You're all caught up",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "There are no cards due for review right now. Come back when it's time for another round.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
