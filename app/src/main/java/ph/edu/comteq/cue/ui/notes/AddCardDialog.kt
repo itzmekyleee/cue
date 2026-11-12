@@ -1,8 +1,10 @@
 package ph.edu.comteq.cue.ui.notes
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -17,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
-import androidx.compose.foundation.layout.Spacer
 
 @Composable
 fun AddCardDialog(
@@ -30,43 +31,62 @@ fun AddCardDialog(
     var questionTouched by remember { mutableStateOf(false) }
     var answerTouched by remember { mutableStateOf(false) }
     val isInvalid = question.isBlank() || answer.isBlank()
-    val title = if (existingCard == null) "Add card" else "Edit card"
+    val title = if (existingCard == null) "New flashcard" else "Edit flashcard"
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    text = "Write a prompt, then the answer you want to remember.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
         text = {
-            Column {
+            Column(
+                modifier = Modifier.padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
                 OutlinedTextField(
                     value = question,
                     onValueChange = {
                         question = it
                         questionTouched = true
                     },
-                    placeholder = { Text("Question") },
+                    label = { Text("Question") },
+                    placeholder = { Text("Ask something specific") },
                     isError = questionTouched && question.isBlank(),
                     supportingText = if (questionTouched && question.isBlank()) {
                         { Text("Question can't be blank") }
                     } else {
                         null
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = answer,
                     onValueChange = {
                         answer = it
                         answerTouched = true
                     },
-                    placeholder = { Text("Answer") },
+                    label = { Text("Answer") },
+                    placeholder = { Text("Add a clear, concise answer") },
                     isError = answerTouched && answer.isBlank(),
                     supportingText = if (answerTouched && answer.isBlank()) {
                         { Text("Answer can't be blank") }
                     } else {
                         null
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 6
                 )
             }
         },
@@ -75,7 +95,7 @@ fun AddCardDialog(
                 onClick = { onConfirm(question.trim(), answer.trim()) },
                 enabled = !isInvalid
             ) {
-                Text(if (existingCard == null) "Add" else "Save")
+                Text(if (existingCard == null) "Add card" else "Save changes")
             }
         },
         dismissButton = {
