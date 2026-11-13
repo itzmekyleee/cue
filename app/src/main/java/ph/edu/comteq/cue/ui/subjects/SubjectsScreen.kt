@@ -11,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Topic
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -236,7 +236,13 @@ private fun SubjectRow(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val accent = colorForKey(subject.colorKey)
+    val isDefaultColor = subject.colorKey == DEFAULT_SUBJECT_COLOR_KEY
+    val accent = colorForKey(subject.colorKey, MaterialTheme.colorScheme.primary)
+    val iconBackground = if (isDefaultColor) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        accent.copy(alpha = 0.14f)
+    }
 
     Card(
         onClick = onClick,
@@ -254,31 +260,31 @@ private fun SubjectRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 14.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+                .padding(horizontal = 14.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(42.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(accent.copy(alpha = 0.14f)),
+                    .background(iconBackground),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Folder,
+                    imageVector = Icons.Default.Topic,
                     contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.size(21.dp)
+                    tint = if (isDefaultColor) MaterialTheme.colorScheme.primary else accent,
+                    modifier = Modifier.size(20.dp)
                 )
             }
             Text(
                 text = subject.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 12.dp),
+                    .padding(start = 12.dp, end = 8.dp),
                 overflow = TextOverflow.Ellipsis
             )
             Box(
