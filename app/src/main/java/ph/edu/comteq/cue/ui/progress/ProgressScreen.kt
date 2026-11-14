@@ -6,6 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,6 +48,13 @@ fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) 
             ) {
                 LargePageHeader(title = "Progress")
 
+                Text(
+                    text = "A little practice adds up.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
+                )
+
                 StreakCard(
                     streakDays = uiState.streakDays,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -57,11 +69,13 @@ fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) 
                     StatCard(
                         label = "Reviewed today",
                         value = uiState.reviewedToday.toString(),
+                        icon = Icons.Default.Today,
                         modifier = Modifier.weight(1f)
                     )
                     StatCard(
                         label = "Accuracy",
                         value = "${uiState.accuracyPercent}%",
+                        icon = Icons.Default.CheckCircle,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -73,6 +87,12 @@ fun ProgressScreenContent(uiState: ProgressUiState, isLoading: Boolean = false) 
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(horizontal = 20.dp)
+                )
+                Text(
+                    text = "See how your cards move through review.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 3.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CardDistribution(
@@ -103,33 +123,40 @@ private fun StreakCard(streakDays: Int, modifier: Modifier = Modifier) {
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "Current streak",
-                    style = MaterialTheme.typography.titleSmall,
+                    text = if (streakDays == 0) "Ready when you are" else "You're on a roll",
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = if (streakDays == 0) "Start today" else "Keep it going",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Study every day to build a streak",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f)
                 )
             }
-            Text(
-                text = "$streakDays",
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                text = if (streakDays == 1) "day" else "days",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(start = 4.dp)
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "$streakDays",
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = if (streakDays == 1) "day" else "days",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(start = 5.dp, bottom = 8.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
+private fun StatCard(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
@@ -146,13 +173,25 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 88.dp)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
             Text(
                 text = value,
                 style = MaterialTheme.typography.headlineSmall,
@@ -169,9 +208,9 @@ private fun CardDistribution(
     modifier: Modifier = Modifier
 ) {
     val boxDetails = listOf(
-        "Box 1" to "1 day",
-        "Box 2" to "3 days",
-        "Box 3" to "7 days"
+        Triple("New", "1 day", MaterialTheme.colorScheme.primary),
+        Triple("Learning", "3 days", androidx.compose.ui.graphics.Color(0xFF1D9E75)),
+        Triple("Mastered", "7 days", androidx.compose.ui.graphics.Color(0xFF7F77DD))
     )
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -187,9 +226,14 @@ private fun CardDistribution(
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            boxDetails.forEachIndexed { index, (label, interval) ->
+            boxDetails.forEachIndexed { index, (label, interval, accent) ->
                 val count = boxCounts[index]
-                val fraction = if (totalCards == 0) 0f else count.toFloat() / totalCards
+                val targetFraction = if (totalCards == 0) 0f else count.toFloat() / totalCards
+                val fraction by animateFloatAsState(
+                    targetValue = targetFraction,
+                    animationSpec = tween(350),
+                    label = "boxDistribution"
+                )
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -205,7 +249,7 @@ private fun CardDistribution(
                             Text(
                                 text = label,
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = accent
                             )
                             Text(
                                 text = "$interval review interval",
@@ -234,7 +278,7 @@ private fun CardDistribution(
                                     .fillMaxWidth(fraction)
                                     .fillMaxHeight()
                                     .background(
-                                        MaterialTheme.colorScheme.primary,
+                                        accent,
                                         RoundedCornerShape(50)
                                     )
                             )

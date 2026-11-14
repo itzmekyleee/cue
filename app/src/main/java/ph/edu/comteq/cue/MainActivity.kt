@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -139,25 +140,25 @@ fun Cue() {
                                     label = "Subjects",
                                     icon = Icons.AutoMirrored.Filled.MenuBook,
                                     selected = currentRoute == "subjects",
-                                    onClick = { navController.navigate("subjects") { launchSingleTop = true } }
+                                    onClick = { navController.navigateToTopLevel("subjects") }
                                 )
                                 FloatingNavigationItem(
                                     label = "Review",
                                     icon = Icons.Default.Style,
                                     selected = currentRoute == "review?subjectId={subjectId}",
-                                    onClick = { navController.navigate("review") { launchSingleTop = true } }
+                                    onClick = { navController.navigateToTopLevel("review") }
                                 )
                                 FloatingNavigationItem(
                                     label = "Progress",
                                     icon = Icons.Default.BarChart,
                                     selected = currentRoute == "progress",
-                                    onClick = { navController.navigate("progress") { launchSingleTop = true } }
+                                    onClick = { navController.navigateToTopLevel("progress") }
                                 )
                                 FloatingNavigationItem(
                                     label = "Settings",
                                     icon = Icons.Default.Settings,
                                     selected = currentRoute == "settings",
-                                    onClick = { navController.navigate("settings") { launchSingleTop = true } }
+                                    onClick = { navController.navigateToTopLevel("settings") }
                                 )
                             }
                         }
@@ -170,14 +171,14 @@ fun Cue() {
                 startDestination = "subjects",
                 modifier = Modifier.padding(padding),
                 enterTransition = {
-                    fadeIn(animationSpec = tween(220)) +
-                        slideInHorizontally(animationSpec = tween(220)) { it / 12 }
+                    fadeIn(animationSpec = tween(180)) +
+                        slideInHorizontally(animationSpec = tween(180)) { it / 28 }
                 },
-                exitTransition = { fadeOut(animationSpec = tween(160)) },
-                popEnterTransition = { fadeIn(animationSpec = tween(220)) },
+                exitTransition = { fadeOut(animationSpec = tween(140)) },
+                popEnterTransition = { fadeIn(animationSpec = tween(180)) },
                 popExitTransition = {
-                    fadeOut(animationSpec = tween(160)) +
-                        slideOutHorizontally(animationSpec = tween(220)) { -it / 12 }
+                    fadeOut(animationSpec = tween(140)) +
+                        slideOutHorizontally(animationSpec = tween(180)) { -it / 28 }
                 }
             ) {
                 composable("subjects") {
@@ -285,6 +286,16 @@ fun Cue() {
                 }
             }
         }
+    }
+}
+
+private fun NavHostController.navigateToTopLevel(route: String) {
+    navigate(route) {
+        popUpTo("subjects") {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }
 

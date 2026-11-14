@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -107,7 +111,7 @@ fun ReviewScreenContent(
 
                     Spacer(modifier = Modifier.height(10.dp))
                     LinearProgressIndicator(
-                        progress = { (currentIndex + 1f) / totalCards },
+                        progress = { currentIndex.toFloat() / totalCards },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(6.dp)
@@ -126,37 +130,45 @@ fun ReviewScreenContent(
 
                     Spacer(modifier = Modifier.height(18.dp))
 
-                    if (isFlipped) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedButton(
-                                onClick = { onAnswer(false) },
-                                modifier = Modifier.weight(1f).height(54.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.error
-                                ),
-                                border = BorderStroke(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
-                                )
+                    AnimatedContent(
+                        targetState = isFlipped,
+                        transitionSpec = {
+                            fadeIn(tween(150)) togetherWith fadeOut(tween(100))
+                        },
+                        label = "reviewActions"
+                    ) { answerShown ->
+                        if (answerShown) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Missed")
+                                OutlinedButton(
+                                    onClick = { onAnswer(false) },
+                                    modifier = Modifier.weight(1f).height(54.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error
+                                    ),
+                                    border = BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                                    )
+                                ) {
+                                    Text("Missed")
+                                }
+                                Button(
+                                    onClick = { onAnswer(true) },
+                                    modifier = Modifier.weight(1f).height(54.dp)
+                                ) {
+                                    Text("Got it")
+                                }
                             }
+                        } else {
                             Button(
-                                onClick = { onAnswer(true) },
-                                modifier = Modifier.weight(1f).height(54.dp)
+                                onClick = onFlip,
+                                modifier = Modifier.fillMaxWidth().height(54.dp)
                             ) {
-                                Text("Got it")
+                                Text("Show answer")
                             }
-                        }
-                    } else {
-                        Button(
-                            onClick = onFlip,
-                            modifier = Modifier.fillMaxWidth().height(54.dp)
-                        ) {
-                            Text("Show answer")
                         }
                     }
                 }
