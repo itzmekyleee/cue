@@ -78,7 +78,9 @@ fun ReviewScreenContent(
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = { NavigationPageHeader(title = "Review", onBackClick = onBackClick) }
+        topBar = {
+            NavigationPageHeader(title = "Review", onBackClick = onBackClick)
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -232,19 +234,47 @@ private fun FlipCard(
                     .verticalScroll(rememberScrollState()),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (rotation <= 90f) card.question else card.answer,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = if (rotation > 90f) {
-                        Modifier
+                if (rotation <= 90f) {
+                    Text(
+                        text = card.question,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .graphicsLayer { rotationY = 180f }
-                    } else {
-                        Modifier.fillMaxWidth()
+                            .graphicsLayer { rotationY = 180f },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "In response to",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = card.question,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        Text(
+                            text = card.answer,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                )
+                }
             }
             Text(
                 text = if (isFlipped) "Tap to see question" else "Tap to reveal answer",

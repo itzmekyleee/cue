@@ -61,7 +61,7 @@ class NotesListViewModel(
     val dueCount: StateFlow<Int> = cardRepository.dueCount(subjectId)
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = 0
         )
 

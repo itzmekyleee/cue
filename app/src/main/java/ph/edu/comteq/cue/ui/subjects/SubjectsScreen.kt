@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Topic
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -215,15 +216,36 @@ fun SubjectsScreenContent(
 
 @Composable
 fun ReviewButton(dueCount: Int, onClick: () -> Unit) {
-    BadgedBox(
-        badge = {
-            if (dueCount > 0) {
-                Badge { Text("$dueCount") }
-            }
-        }
+    FilledTonalButton(
+        onClick = onClick,
+        enabled = dueCount > 0,
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        FilledTonalButton(onClick = onClick, enabled = dueCount > 0) {
-            Text("Review")
+        Icon(
+            imageVector = Icons.Default.Style,
+            contentDescription = null,
+            modifier = Modifier.size(17.dp)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text("Review", style = MaterialTheme.typography.labelLarge)
+        Spacer(modifier = Modifier.width(7.dp))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(
+                    if (dueCount > 0) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+                .padding(horizontal = 7.dp, vertical = 2.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = dueCount.toString(),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (dueCount > 0) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

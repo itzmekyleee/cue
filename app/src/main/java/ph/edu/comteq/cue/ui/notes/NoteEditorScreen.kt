@@ -121,6 +121,23 @@ fun NoteEditorScreenContent(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (!isLoading) {
+                FilledTonalButton(
+                    onClick = { showAddCardDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .navigationBarsPadding()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Add flashcard")
+                }
+            }
         }
     ) { padding ->
         if (isLoading) {
@@ -226,20 +243,6 @@ fun NoteEditorScreenContent(
                     )
                 }
 
-                item {
-                    FilledTonalButton(
-                        onClick = { showAddCardDialog = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 2.dp)
-                            .height(50.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Add flashcard")
-                    }
-                }
             }
         }
     }

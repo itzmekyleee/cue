@@ -120,20 +120,20 @@ fun Cue() {
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(68.dp)
-                                .clip(RoundedCornerShape(22.dp)),
-                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            shadowElevation = 5.dp,
+                                .height(62.dp)
+                                .clip(RoundedCornerShape(20.dp)),
+                            color = MaterialTheme.colorScheme.surface,
+                            shadowElevation = 4.dp,
                             border = BorderStroke(
                                 1.dp,
                                 MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
                             ),
-                            shape = RoundedCornerShape(22.dp)
+                            shape = RoundedCornerShape(20.dp)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                                    .padding(horizontal = 6.dp, vertical = 5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 FloatingNavigationItem(
@@ -295,7 +295,7 @@ private fun NavHostController.navigateToTopLevel(route: String) {
             saveState = true
         }
         launchSingleTop = true
-        restoreState = true
+        restoreState = route != "subjects"
     }
 }
 
@@ -308,7 +308,7 @@ private fun RowScope.FloatingNavigationItem(
 ) {
     val iconBackground by animateColorAsState(
         targetValue = if (selected) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.surfaceContainerHigh,
+        else MaterialTheme.colorScheme.surface,
         animationSpec = tween(180),
         label = "navigationIconBackground"
     )
@@ -328,8 +328,8 @@ private fun RowScope.FloatingNavigationItem(
     Row(
         modifier = Modifier
             .weight(1f)
-            .height(52.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .height(48.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(iconBackground)
             .selectable(
                 selected = selected,

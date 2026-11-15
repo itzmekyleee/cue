@@ -81,7 +81,7 @@ fun SettingsScreenContent(
             ) {
                 LargePageHeader(title = "Settings")
                 Text(
-                    text = "Make Cue work the way you study.",
+                    text = "Your preferences are saved automatically.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 8.dp)

@@ -28,8 +28,8 @@ fun LargePageHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .padding(start = 20.dp, end = 8.dp, top = 4.dp, bottom = 8.dp),
+            .heightIn(min = 68.dp)
+            .padding(start = 20.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBackClick != null) {
@@ -43,9 +43,11 @@ fun LargePageHeader(
         }
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
         actions()
