@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -166,7 +165,6 @@ fun NotesListScreenContent(
                         NoteRow(
                             note = note,
                             onClick = { onNoteClick(note) },
-                            onEditClick = { onNoteClick(note) },
                             onDeleteClick = {
                                 pendingDeletion = note
                                 showDeleteConfirmation = true
@@ -272,7 +270,6 @@ private fun TagChip(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun NoteRow(
     note: Note,
     onClick: () -> Unit,
-    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -334,37 +331,20 @@ private fun NoteRow(
                     )
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(9.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clickable(onClick = onEditClick, role = Role.Button),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit ${note.title.ifBlank { "note" }}",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(9.dp))
-                        .background(MaterialTheme.colorScheme.errorContainer)
-                        .clickable(onClick = onDeleteClick, role = Role.Button),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete ${note.title.ifBlank { "note" }}",
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .clickable(onClick = onDeleteClick, role = Role.Button),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete ${note.title.ifBlank { "note" }}",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(15.dp)
+                )
             }
         }
     }

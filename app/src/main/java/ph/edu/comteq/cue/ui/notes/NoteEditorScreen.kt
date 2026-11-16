@@ -151,42 +151,56 @@ fun NoteEditorScreenContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = onTitleChange,
-                        label = { Text("Title") },
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.titleLarge,
-                        shape = RoundedCornerShape(18.dp),
+                    EditorField(
+                        label = "Title",
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        TextField(
+                            value = title,
+                            onValueChange = onTitleChange,
+                            placeholder = { Text("Note title") },
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.headlineSmall,
+                            colors = editorTextFieldColors(),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
                 item {
-                    OutlinedTextField(
-                        value = body,
-                        onValueChange = onBodyChange,
-                        label = { Text("Note") },
-                        placeholder = { Text("Write down what you want to remember...") },
-                        minLines = 5,
-                        maxLines = 12,
-                        shape = RoundedCornerShape(18.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 150.dp, max = 260.dp)
-                    )
+                    EditorField(
+                        label = "Description",
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextField(
+                            value = body,
+                            onValueChange = onBodyChange,
+                            placeholder = { Text("Write your note...") },
+                            minLines = 5,
+                            maxLines = 12,
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            colors = editorTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 150.dp, max = 260.dp)
+                        )
+                    }
                 }
 
                 item {
-                    OutlinedTextField(
-                        value = tagsText,
-                        onValueChange = onTagsTextChange,
-                        label = { Text("Tags") },
-                        placeholder = { Text("Separate tags with commas") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(18.dp),
+                    EditorField(
+                        label = "Tags",
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        TextField(
+                            value = tagsText,
+                            onValueChange = onTagsTextChange,
+                            placeholder = { Text("Separate tags with commas") },
+                            singleLine = true,
+                            colors = editorTextFieldColors(),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
                 item {
@@ -330,6 +344,46 @@ fun NoteEditorScreenContent(
         )
     }
 }
+
+@Composable
+private fun EditorField(
+    label: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp)
+        )
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
+            )
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun editorTextFieldColors() = TextFieldDefaults.colors(
+    focusedContainerColor = MaterialTheme.colorScheme.surface,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+    disabledContainerColor = MaterialTheme.colorScheme.surface,
+    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+    disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+    cursorColor = MaterialTheme.colorScheme.primary
+)
 
 @Composable
 private fun CardRow(card: Card, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
