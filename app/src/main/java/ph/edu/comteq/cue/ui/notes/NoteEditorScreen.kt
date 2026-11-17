@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ph.edu.comteq.cue.data.local.entity.Card
@@ -151,55 +153,51 @@ fun NoteEditorScreenContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
-                    EditorField(
-                        label = "Title",
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        TextField(
-                            value = title,
-                            onValueChange = onTitleChange,
-                            placeholder = { Text("Note title") },
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.headlineSmall,
-                            colors = editorTextFieldColors(),
-                            modifier = Modifier.fillMaxWidth()
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f)
                         )
-                    }
-                }
-
-                item {
-                    EditorField(
-                        label = "Description",
-                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        TextField(
-                            value = body,
-                            onValueChange = onBodyChange,
-                            placeholder = { Text("Write your note...") },
-                            minLines = 5,
-                            maxLines = 12,
-                            textStyle = MaterialTheme.typography.bodyLarge,
-                            colors = editorTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 150.dp, max = 260.dp)
-                        )
-                    }
-                }
-
-                item {
-                    EditorField(
-                        label = "Tags",
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        TextField(
-                            value = tagsText,
-                            onValueChange = onTagsTextChange,
-                            placeholder = { Text("Separate tags with commas") },
-                            singleLine = true,
-                            colors = editorTextFieldColors(),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                            NoteTextInput(
+                                label = "Title",
+                                value = title,
+                                placeholder = "Note title",
+                                textStyle = MaterialTheme.typography.titleLarge,
+                                onValueChange = onTitleChange,
+                                singleLine = true
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
+                            )
+                            NoteTextInput(
+                                label = "Description",
+                                value = body,
+                                placeholder = "Write your note...",
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                onValueChange = onBodyChange,
+                                minLines = 5,
+                                maxLines = 12,
+                                modifier = Modifier.heightIn(min = 150.dp, max = 260.dp)
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
+                            )
+                            NoteTextInput(
+                                label = "Tags",
+                                value = tagsText,
+                                placeholder = "Separate tags with commas",
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                onValueChange = onTagsTextChange,
+                                singleLine = true
+                            )
+                        }
                     }
                 }
 
@@ -346,44 +344,52 @@ fun NoteEditorScreenContent(
 }
 
 @Composable
-private fun EditorField(
+private fun NoteTextInput(
     label: String,
+    value: String,
+    placeholder: String,
+    textStyle: androidx.compose.ui.text.TextStyle,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    singleLine: Boolean = false,
+    minLines: Int = 1,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp)
+            color = MaterialTheme.colorScheme.primary
         )
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(
-                1.dp,
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
-            )
-        ) {
-            content()
-        }
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            singleLine = singleLine,
+            minLines = minLines,
+            maxLines = maxLines,
+            modifier = Modifier.fillMaxWidth(),
+            decorationBox = { innerTextField ->
+                Box(contentAlignment = Alignment.TopStart) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            style = textStyle,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
     }
 }
-
-@Composable
-private fun editorTextFieldColors() = TextFieldDefaults.colors(
-    focusedContainerColor = MaterialTheme.colorScheme.surface,
-    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-    disabledContainerColor = MaterialTheme.colorScheme.surface,
-    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-    disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-    cursorColor = MaterialTheme.colorScheme.primary
-)
 
 @Composable
 private fun CardRow(card: Card, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
