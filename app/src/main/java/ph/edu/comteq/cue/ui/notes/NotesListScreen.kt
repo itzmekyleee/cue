@@ -329,6 +329,36 @@ private fun NoteRow(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+                val noteTags = note.tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                if (noteTags.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        noteTags.take(2).forEach { tag ->
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer
+                            ) {
+                                Text(
+                                    text = tag,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                        if (noteTags.size > 2) {
+                            Text(
+                                text = "+${noteTags.size - 2}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             }
             Box(
                 modifier = Modifier
